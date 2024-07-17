@@ -27,6 +27,7 @@ class BootReceiver : BroadcastReceiver() {
 
     @Inject
     fun setSharedPreferences(preferences: SharedPreferences) {
+        Log.i(TAG, "setSharedPreferences: $preferences")
         this.preferences = preferences
     }
 

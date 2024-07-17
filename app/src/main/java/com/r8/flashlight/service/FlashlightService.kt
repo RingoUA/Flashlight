@@ -85,7 +85,8 @@ class FlashlightService : LifecycleService() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
 
-        return NotificationCompat.Builder(this, channelId)
+        return NotificationCompat
+            .Builder(this, channelId)
             .setContentTitle("Flashlight")
             .setContentText("Service is running")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -101,11 +102,13 @@ class FlashlightService : LifecycleService() {
         private const val TAG = "FlashlightService"
 
         fun startForeground(context: Context?) {
+            Log.i(TAG, "startForeground: $context")
             val serviceIntent = Intent(context, FlashlightService::class.java)
             context?.startForegroundService(serviceIntent)
         }
 
         fun stopService(context: Context?) {
+            Log.i(TAG, "stopService: $context")
             val serviceIntent = Intent(context, FlashlightService::class.java)
             context?.stopService(serviceIntent)
         }

@@ -22,23 +22,17 @@ class AppModule {
     @Singleton
     fun provideCameraManager(
         @ApplicationContext context: Context,
-    ): CameraManager {
-        return context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
-    }
+    ): CameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
     @Provides
     @Singleton
     fun provideSharedPreferences(
         @ApplicationContext context: Context,
-    ): SharedPreferences {
-        return context.getSharedPreferences("com.r8.flashlight", Context.MODE_PRIVATE)
-    }
+    ): SharedPreferences = context.getSharedPreferences(context.packageName, Context.MODE_PRIVATE)
 
     @Provides
     @Singleton
-    fun provideFlashlightController(cameraManager: CameraManager): FlashlightController {
-        return FlashlightController(cameraManager)
-    }
+    fun provideFlashlightController(cameraManager: CameraManager): FlashlightController = FlashlightController(cameraManager)
 
     @Provides
     @Singleton
@@ -54,7 +48,5 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideVibratorController(vibrator: Vibrator): VibratorController {
-        return VibratorController(vibrator)
-    }
+    fun provideVibratorController(vibrator: Vibrator): VibratorController = VibratorController(vibrator)
 }
