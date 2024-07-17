@@ -37,7 +37,7 @@ fun MainScreen(
     flashlightController: FlashlightController,
 ) {
     var autoStartEnabled by remember { mutableStateOf(preferences.getBoolean("auto_start", true)) }
-    val flashlightState by remember { mutableStateOf(flashlightController.flashlightState) }
+    var flashlightState by remember { mutableStateOf(flashlightController.flashlightState) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -58,7 +58,10 @@ fun MainScreen(
         }
         Spacer(modifier = Modifier)
         Button(
-            onClick = { flashlightController.toggleFlashlight() },
+            onClick = {
+                flashlightController.toggleFlashlight()
+                flashlightState = flashlightController.flashlightState
+            },
             colors =
                 ButtonDefaults.buttonColors(
                     Color.Gray,
