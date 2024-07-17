@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.r8.flashlight.Constants
 import com.r8.flashlight.service.FlashlightController
 import com.r8.flashlight.service.FlashlightService
 
@@ -36,7 +37,11 @@ fun MainScreen(
     preferences: SharedPreferences,
     flashlightController: FlashlightController,
 ) {
-    var autoStartEnabled by remember { mutableStateOf(preferences.getBoolean("auto_start", true)) }
+    var autoStartEnabled by remember {
+        mutableStateOf(
+            preferences.getBoolean(Constants.PREF_START_SERVICE_ON_BOOT, true),
+        )
+    }
     var flashlightState by remember { mutableStateOf(flashlightController.flashlightState) }
 
     Column(
@@ -88,7 +93,7 @@ fun MainScreen(
                 checked = autoStartEnabled,
                 onCheckedChange = {
                     autoStartEnabled = it
-                    preferences.edit().putBoolean("auto_start", it).apply()
+                    preferences.edit().putBoolean(Constants.PREF_START_SERVICE_ON_BOOT, it).apply()
 
                     if (autoStartEnabled) {
                         FlashlightService.startForeground(localContext)

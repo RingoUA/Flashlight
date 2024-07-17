@@ -15,6 +15,7 @@ class ProximityHandler
         private val sensorManager: SensorManager,
         private val accelerometerHandler: AccelerometerHandler,
     ) {
+        private var isRegistered = false
         private var proximitySensor: Sensor? = null
 
         private val sensorEventListener =
@@ -41,20 +42,29 @@ class ProximityHandler
         init {
             Log.i(TAG, "init")
             proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
-            accelerometerHandler.register()
         }
 
         fun register() {
-            Log.i(TAG, "register")
-            proximitySensor?.also {
-                sensorManager.registerListener(sensorEventListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL)
+            if (!isRegistered) {
+                Log.i(TAG, "register")
+                proximitySensor?.also {
+                    sensorManager.registerListener(
+                        sensorEventListener,
+                        proximitySensor,
+                        SensorManager.SENSOR_DELAY_NORMAL,
+                    )
+                    isRegistered = true
+                }
             }
         }
 
         fun unregister() {
-            Log.i(TAG, "unregister")
-            accelerometerHandler.unregister()
-            sensorManager.unregisterListener(sensorEventListener)
+            if (isRegistered) {
+                Log.i(TAG, "unregister")
+                accelerometerHandler.unregister()
+                sensorManager.unregisterListener(sensorEventListener)
+                isRegistered = false
+            }
         }
 
         companion object {

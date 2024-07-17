@@ -20,6 +20,7 @@ class AccelerometerHandler
         private val shakeSlopTimeMs = 500
         private val shakeCountResetTimeMs = 3000
 
+        private var isRegistered = false
         private var shakeTimestamp: Long = 0
         private var shakeCount: Int = 0
 
@@ -73,15 +74,25 @@ class AccelerometerHandler
         }
 
         fun register() {
-            Log.i(TAG, "register")
-            accelerometer?.also {
-                sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+            if (!isRegistered) {
+                Log.i(TAG, "register")
+                accelerometer?.also {
+                    sensorManager.registerListener(
+                        sensorEventListener,
+                        accelerometer,
+                        SensorManager.SENSOR_DELAY_NORMAL,
+                    )
+                    isRegistered = true
+                }
             }
         }
 
         fun unregister() {
-            Log.i(TAG, "unregister")
-            sensorManager.unregisterListener(sensorEventListener)
+            if (isRegistered) {
+                Log.i(TAG, "unregister")
+                sensorManager.unregisterListener(sensorEventListener)
+                isRegistered = false
+            }
         }
 
         companion object {
