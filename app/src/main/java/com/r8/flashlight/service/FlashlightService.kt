@@ -5,11 +5,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.hardware.SensorManager
 import android.hardware.camera2.CameraManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
+import com.r8.flashlight.Constants
 import com.r8.flashlight.R
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -19,6 +21,7 @@ class FlashlightService : LifecycleService() {
     private lateinit var sensorManager: SensorManager
     private lateinit var cameraManager: CameraManager
     private lateinit var vibratorController: VibratorController
+    private lateinit var preferences: SharedPreferences
 
     private lateinit var proximityHandler: ProximityHandler
 
@@ -29,6 +32,8 @@ class FlashlightService : LifecycleService() {
         cameraManager.registerTorchCallback(vibratorController, null)
 
         startForegroundService()
+
+        isActive = true
     }
 
     override fun onStartCommand(
@@ -38,7 +43,10 @@ class FlashlightService : LifecycleService() {
     ): Int {
         Log.i(TAG, "onStartCommand")
         super.onStartCommand(intent, flags, startId)
-        return START_STICKY
+        if (isShouldStartOnBoot()) {
+            return START_STICKY
+        }
+        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
@@ -46,6 +54,8 @@ class FlashlightService : LifecycleService() {
         proximityHandler.unregister()
         cameraManager.unregisterTorchCallback(vibratorController)
         super.onDestroy()
+
+        isActive = false
     }
 
     @Inject
@@ -72,6 +82,18 @@ class FlashlightService : LifecycleService() {
         this.proximityHandler = proximityHandler
         this.proximityHandler.register()
     }
+
+    @Inject
+    fun setSharedPreferences(preferences: SharedPreferences) {
+        Log.i(TAG, "setSharedPreferences: $preferences")
+        this.preferences = preferences
+    }
+
+    private fun isShouldStartOnBoot(): Boolean =
+        preferences.getBoolean(
+            Constants.PREF_START_SERVICE_ON_BOOT,
+            false,
+        )
 
     private fun createNotification(): Notification {
         val channelId = "my_service_channel"
@@ -100,17 +122,22 @@ class FlashlightService : LifecycleService() {
 
     companion object {
         private const val TAG = "FlashlightService"
+        private var isActive = false
 
         fun startForeground(context: Context?) {
-            Log.i(TAG, "startForeground: $context")
-            val serviceIntent = Intent(context, FlashlightService::class.java)
-            context?.startForegroundService(serviceIntent)
+            if (!isActive) {
+                Log.i(TAG, "startForeground: $context")
+                val serviceIntent = Intent(context, FlashlightService::class.java)
+                context?.startForegroundService(serviceIntent)
+            }
         }
 
         fun stopService(context: Context?) {
-            Log.i(TAG, "stopService: $context")
-            val serviceIntent = Intent(context, FlashlightService::class.java)
-            context?.stopService(serviceIntent)
+            if (isActive) {
+                Log.i(TAG, "stopService: $context")
+                val serviceIntent = Intent(context, FlashlightService::class.java)
+                context?.stopService(serviceIntent)
+            }
         }
     }
 }
