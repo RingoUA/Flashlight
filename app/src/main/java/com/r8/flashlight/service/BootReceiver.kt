@@ -20,7 +20,7 @@ class BootReceiver : BroadcastReceiver() {
         Log.i(TAG, "onReceive")
         if (
             intent?.action == Intent.ACTION_BOOT_COMPLETED ||
-            intent?.action == Intent.ACTION_SCREEN_ON
+            intent?.action == Intent.ACTION_USER_PRESENT
         ) {
             if (isShouldStartOnBoot()) {
                 FlashlightService.startForeground(context)
