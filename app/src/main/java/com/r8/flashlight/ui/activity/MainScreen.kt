@@ -28,10 +28,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.r8.flashlight.Constants
 import com.r8.flashlight.service.FlashlightController
 import com.r8.flashlight.service.FlashlightService
 
+@Suppress("ktlint:standard:function-naming")
 @Composable
 fun MainScreen(
     preferences: SharedPreferences,
@@ -93,7 +95,7 @@ fun MainScreen(
                 checked = autoStartEnabled,
                 onCheckedChange = {
                     autoStartEnabled = it
-                    preferences.edit().putBoolean(Constants.PREF_START_SERVICE_ON_BOOT, it).apply()
+                    preferences.edit { putBoolean(Constants.PREF_START_SERVICE_ON_BOOT, it) }
 
                     if (autoStartEnabled) {
                         FlashlightService.startForeground(localContext)
